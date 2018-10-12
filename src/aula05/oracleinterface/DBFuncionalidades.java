@@ -95,6 +95,34 @@ public class DBFuncionalidades {
         return res;  
     }
     
+    
+    public String getDomain(String tableName){
+        String s = "";
+        String res = "";
+        
+        try{
+            s = "SELECT SEARCH_CONDITION FROM USER_CONSTRAINTS WHERE TABLE_NAME = '"+ tableName +"'";
+            Statement stmt = this.connection.createStatement();
+            ResultSet rs = stmt.executeQuery(s);
+            
+            while(rs.next()){
+                res += rs.getString("SEARCH_CONDITION") + "/";
+            }
+            
+            rs.close();
+            stmt.close();
+            
+            res = res.substring(0, res.length()-1);
+            System.out.println(res);
+            return res;
+     
+        }catch(SQLException ex){
+            //System.out.println("foi aqui");
+            this.jtAreaDeStatus.setText(ex.getMessage());
+        }
+        
+        return res;
+    }
     public String getPrimaryKeys(String tableName){
         String s = "";
         String res = "";
@@ -182,11 +210,13 @@ public class DBFuncionalidades {
             for(int i = 0; i< columns.size(); i++){
                 if(dataTypes.get(i).equals("NUMBER")){
                     s += columns.get(i) + " = "  + data[i];
-                }else{
-                    s += s += columns.get(i) + " = "  + "'" + data[i] + "'";
+                }else if(dataTypes.get(i).equals("VARCHAR2") || dataTypes.get(i).equals("CHAR")){
+                    s += columns.get(i) + " = "  + "'" + data[i] + "'";
+                }else if(dataTypes.get(i).equals("DATE")){
+                    s += columns.get(i) + " = TO_DATE("  + "'" + splitString(data[i], " ").get(0) + "', 'YYYY-MM-DD')";
                 }
                 
-                if(i != columns.size() - 1){
+                if(i < columns.size() - 1){
                     s +=  ",";
                 }
             }
@@ -199,21 +229,21 @@ public class DBFuncionalidades {
                     s += s += columns.get(i) + " = "  + "'" + ids[i] + "'";
                 }
                 
-                if(i != columns.size() - 1){
+                if(i != ids.length - 1){
                     s +=  " AND ";
                 }
             }
-            System.out.println("ta por aqui");
-            System.out.println(s);
+            
             
             Statement stmt = this.connection.createStatement();
             int dialogButton = JOptionPane.YES_NO_OPTION;
             int dialogResult = JOptionPane.showConfirmDialog(null, "Deseja mesmo remover a tupla selecionada?", "", dialogButton);
             if(dialogResult == 0) {
+                System.out.println(s);
                 ResultSet rs = stmt.executeQuery(s);  
                 rs.close();
             }
-
+             
             stmt.close();
 
         }catch(SQLException ex){

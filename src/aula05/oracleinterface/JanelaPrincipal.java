@@ -43,6 +43,7 @@ public class JanelaPrincipal {
     JButton deleteButton;
     JButton searchButton;
     JButton updateButton;
+    JButton insertButton;
     DBFuncionalidades bd;
     String tableName;
     String[] data; 
@@ -139,6 +140,27 @@ public class JanelaPrincipal {
             }
         });
         
+        insertButton = new JButton("Inserir");
+        
+        insertButton.addActionListener( new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                ArrayList<String> domains = bd.splitString(bd.getDomain(tableName), "/");
+                    System.out.println(domains.size());
+                
+                for(int i = 0; i < domains.size(); i++){
+                    System.out.println(domains.get(i));
+                }
+                
+                domains = filterChecks(domains);
+                System.out.println("-----DEPOIS-----");
+                for(int i = 0; i < domains.size(); i++){
+                    System.out.println(domains.get(i));
+                }
+            }
+        });
+        
         this.showDisplayPanel();
         /*Tab de inserÃ§Ã£o*/
         pPainelDeInsecaoDeDados = new JPanel();
@@ -149,6 +171,16 @@ public class JanelaPrincipal {
         updateSearchPanel();
         j.setVisible(true);
         
+    }
+    
+    private ArrayList<String> filterChecks(ArrayList<String> domains){
+        for(int i = 0; i < domains.size(); i++){
+            if(!domains.get(i).contains("IN")){
+                domains.remove(i);
+            }
+        }
+        
+        return domains;
     }
     
     public void updateSearchPanel(){
@@ -207,11 +239,13 @@ public class JanelaPrincipal {
         String columnNames = this.bd.getMeta(tableName, "COLUMN_NAME");
         ArrayList<String> arr = this.bd.splitString(columnNames, ",");
         int nLinhas = arr.size();
-        pPainelDeInsecaoDeDados.setLayout(new GridLayout(nLinhas, 2));
+        pPainelDeInsecaoDeDados.setLayout(new GridLayout(nLinhas + 1, 2));
         for(int i = 0; i< nLinhas; i++){
             pPainelDeInsecaoDeDados.add(new JLabel(arr.get(i)));
             pPainelDeInsecaoDeDados.add(new JTextField("Digite aqui"));
         }
+        pPainelDeInsecaoDeDados.add(new JLabel(""));    
+        pPainelDeInsecaoDeDados.add(insertButton);
     }
     
     private void showDisplayPanel(){
