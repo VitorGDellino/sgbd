@@ -7,10 +7,14 @@ package aula05.oracleinterface;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -34,16 +38,19 @@ public class JanelaPrincipal {
     JPanel pPainelDeBaixo;
     JComboBox jc;
     JTextArea jtAreaDeStatus;
+    JTextArea jtAreaDDL;
     JTabbedPane tabbedPane;
     JPanel pPainelDeExibicaoDeDados;
     JTable jt;
     JTable query;
     JPanel pPainelDeInsecaoDeDados;
     JPanel pPainelDeBuscaDeDados;
+    JPanel pPainelDDL;
     JButton deleteButton;
     JButton searchButton;
     JButton updateButton;
     JButton insertButton;
+    JButton ddlButton;
     DBFuncionalidades bd;
     String tableName;
     String[] data; 
@@ -161,6 +168,18 @@ public class JanelaPrincipal {
             }
         });
         
+        ddlButton = new JButton("Gerar");
+        
+        ddlButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String usuario = ((JTextField)((JPanel)pPainelDDL.getComponent(0)).getComponent(0)).getText();
+                String senha = ((JTextField)((JPanel)pPainelDDL.getComponent(0)).getComponent(1)).getText();
+                String text = bd.generateDLL(usuario, senha);
+                jtAreaDDL.setText(text);
+            }
+        });
+        
         this.showDisplayPanel();
         /*Tab de inserÃ§Ã£o*/
         pPainelDeInsecaoDeDados = new JPanel();
@@ -169,6 +188,10 @@ public class JanelaPrincipal {
         pPainelDeBuscaDeDados = new JPanel();
         tabbedPane.add(pPainelDeBuscaDeDados, "Busca e Update");
         updateSearchPanel();
+        
+        pPainelDDL = new JPanel();
+        tabbedPane.add(pPainelDDL, "Gerar DDL");
+        updateDDLPanel();
         j.setVisible(true);
         
     }
@@ -181,6 +204,11 @@ public class JanelaPrincipal {
         }
         
         return domains;
+    }
+    
+    public void updateDDLPanel(){
+        pPainelDDL.removeAll();
+        showDDLPanel();
     }
     
     public void updateSearchPanel(){
@@ -211,6 +239,34 @@ public class JanelaPrincipal {
                 updateSearchPanel();
             }
         });
+    }
+    
+    private void showDDLPanel(){
+        pPainelDDL.setLayout(new GridBagLayout());
+        
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.anchor = GridBagConstraints.FIRST_LINE_START;
+        c.weightx = 1;
+        c.weighty = 0.05;
+        JPanel userPanel = new JPanel();
+        c.gridheight = 1;
+        c.gridx = 0;
+        c.gridy = 0;
+        userPanel.setLayout(new GridLayout(1, 3));
+        userPanel.add(new JTextField("Usuário"));
+        userPanel.add(new JTextField("Senha"));
+        userPanel.add(ddlButton);
+        pPainelDDL.add(userPanel, c);
+        
+        jtAreaDDL = new JTextArea();
+        JScrollPane ddl = new JScrollPane(jtAreaDDL);
+        jtAreaDDL.setEditable(false);
+        c.weighty = 0.95;
+        c.gridheight = 9;
+        c.gridx = 0;
+        c.gridy = 1;
+        pPainelDDL.add(ddl, c);
     }
     
     private void showSearchPanel(){

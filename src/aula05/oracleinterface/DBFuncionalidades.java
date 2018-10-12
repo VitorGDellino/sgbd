@@ -6,6 +6,7 @@ package aula05.oracleinterface;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -44,6 +45,21 @@ public class DBFuncionalidades {
         }
         return false;
     }
+    
+    public Connection conectar_usuario(String usuario, String senha){       
+        try {
+            DriverManager.registerDriver (new oracle.jdbc.OracleDriver());
+            Connection con = DriverManager.getConnection(
+                    "jdbc:oracle:thin:@grad.icmc.usp.br:15215:orcl",
+                    usuario,
+                    senha);
+            return con;
+        } catch(SQLException ex){
+            jtAreaDeStatus.setText("Problema: verifique seu usuário e senha");
+        }
+        return null;
+    }
+    
     public void pegarNomesDeTabelas(JComboBox jc){
         String s = "";
         try {
@@ -249,6 +265,40 @@ public class DBFuncionalidades {
         }catch(SQLException ex){
             this.jtAreaDeStatus.setText(ex.getMessage());
         }
+    }
+    
+    public String generateDLL(String usuario, String senha){
+        Connection connect = conectar_usuario(usuario, senha);
+        try{
+            String tables = "SELECT TABLE_NAME FROM USER_ALL_TABLES ORDER BY TABLE_NAME";
+            Statement stmt = connect.createStatement();
+            String config = "begin\n" +
+                            "dbms_metadata.set_transform_param(dbms_metadata.session_transform,'STORAGE',false);\n" +
+                            "dbms_metadata.set_transform_param(dbms_metadata.session_transform,'SEGMENT_ATTRIBUTES',false);\n" +
+                            "dbms_metadata.set_transform_param(dbms_metadata.session_transform,'SQLTERMINATOR',true);\n"+
+                            "end;";
+            String ddl = "";
+            ResultSet rs_tables = stmt.executeQuery(tables);
+            Connection c = conectar_usuario(usuario, senha);
+            Statement s = c.createStatement();
+            s.execute(config);
+            while(rs_tables.next()){
+                String table = rs_tables.getString("TABLE_NAME");
+                ResultSet rs = s.executeQuery("select dbms_metadata.get_ddl('TABLE', '"+table+"') ddl from dual");
+                rs.next();
+                String d = rs.getString("DDL");
+                ddl += d + "\n\n";
+                rs.close();
+            }
+            s.close();
+            rs_tables.close();                 
+            stmt.close();
+            return ddl;
+        }catch(SQLException ex){
+            this.jtAreaDeStatus.setText(ex.getMessage());
+        }
+        
+        return null;
     }
     
     public String searchData(String tableName, String[] ids){
