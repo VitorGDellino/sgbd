@@ -153,18 +153,8 @@ public class JanelaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                ArrayList<String> domains = bd.splitString(bd.getDomain(tableName), "/");
-                    System.out.println(domains.size());
+                ArrayList<String> domains = prepareChecks();
                 
-                for(int i = 0; i < domains.size(); i++){
-                    System.out.println(domains.get(i));
-                }
-                
-                domains = filterChecks(domains);
-                System.out.println("-----DEPOIS-----");
-                for(int i = 0; i < domains.size(); i++){
-                    System.out.println(domains.get(i));
-                }
             }
         });
         
@@ -197,13 +187,41 @@ public class JanelaPrincipal {
     }
     
     private ArrayList<String> filterChecks(ArrayList<String> domains){
+        ArrayList<String> newDomains = new ArrayList<String>();
         for(int i = 0; i < domains.size(); i++){
-            if(!domains.get(i).contains("IN")){
-                domains.remove(i);
+            if(domains.get(i).contains(" IN ")){
+                newDomains.add(domains.get(i));
             }
         }
         
-        return domains;
+        return newDomains;
+    }
+    
+    private ArrayList<String> prepareChecks(){
+         ArrayList<String> domains = bd.splitString(bd.getDomain(tableName), "/");
+  
+        domains = filterChecks(domains);
+
+        ArrayList<ArrayList<String>> domainsSplitted = new ArrayList<ArrayList<String>>();
+
+        for(int i = 0; i < domains.size(); i++){
+            domainsSplitted.add(bd.splitString(domains.get(i), " AND "));
+            //System.out.println(domains.get(i));
+        }
+
+
+         ArrayList<String> finalDomains = new ArrayList<String>();
+         for(int i = 0; i < domainsSplitted.size(); i++){
+             for(int j = 0; j < domainsSplitted.get(i).size(); j++){
+                 finalDomains.add(domainsSplitted.get(i).get(j));
+             }
+         }
+
+         for(int i = 0; i < finalDomains.size(); i++){
+           System.out.println(finalDomains.get(i));
+         }
+
+         return finalDomains;
     }
     
     public void updateDDLPanel(){
@@ -271,13 +289,15 @@ public class JanelaPrincipal {
     
     private void showSearchPanel(){
         String columnNames = this.bd.getPrimaryKeys(tableName);
+        //System.out.println(columnNames);
         //String columnNames = this.bd.getMeta(tableName, "COLUMN_NAME");
         ArrayList<String> arr = this.bd.splitString(columnNames, ",");
         int nLinhas = arr.size();
         pPainelDeBuscaDeDados.setLayout(new GridLayout(2, 1));
         pPainelDeBuscaDeDados.add(new JPanel());
         ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).setLayout(new GridLayout(nLinhas + 1, 2));
-        
+        //System.out.println(nLinhas);
+        //System.out.println(arr.get(0));
         for(int i = 0; i< nLinhas; i++){
             ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).add(new JLabel(arr.get(i)));
             ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).add(new JTextField("Digite aqui"));
@@ -296,6 +316,7 @@ public class JanelaPrincipal {
         ArrayList<String> arr = this.bd.splitString(columnNames, ",");
         int nLinhas = arr.size();
         pPainelDeInsecaoDeDados.setLayout(new GridLayout(nLinhas + 1, 2));
+        
         for(int i = 0; i< nLinhas; i++){
             pPainelDeInsecaoDeDados.add(new JLabel(arr.get(i)));
             pPainelDeInsecaoDeDados.add(new JTextField("Digite aqui"));
