@@ -253,7 +253,45 @@ public class DBFuncionalidades {
             
             Statement stmt = this.connection.createStatement();
             int dialogButton = JOptionPane.YES_NO_OPTION;
-            int dialogResult = JOptionPane.showConfirmDialog(null, "Deseja mesmo remover a tupla selecionada?", "", dialogButton);
+            int dialogResult = JOptionPane.showConfirmDialog(null, "Deseja mesmo atualizar a tupla selecionada?", "", dialogButton);
+            if(dialogResult == 0) {
+                System.out.println(s);
+                ResultSet rs = stmt.executeQuery(s);  
+                rs.close();
+            }
+             
+            stmt.close();
+
+        }catch(SQLException ex){
+            this.jtAreaDeStatus.setText(ex.getMessage());
+        }
+    }
+    
+    public void insertData(String tableName, String[] data){
+        System.out.println();
+        try{
+            String s = "INSERT INTO " + tableName + " ("+this.getMeta(tableName, "COLUMN_NAME")+") VALUES (";
+            
+            ArrayList<String> dataTypes = this.splitString(this.getMeta(tableName, "DATA_TYPE"), ",");
+            for(int i = 0; i< dataTypes.size(); i++){
+                if(dataTypes.get(i).equals("NUMBER")){
+                    s += data[i];
+                }else if(dataTypes.get(i).equals("VARCHAR2") || dataTypes.get(i).equals("CHAR")){
+                    s += "'" + data[i] + "'";
+                }else if(dataTypes.get(i).equals("DATE")){
+                    s += "TO_DATE("  + "'" + splitString(data[i], " ").get(0) + "', 'YYYY-MM-DD')";
+                }
+                
+                if(i < dataTypes.size() - 1){
+                    s +=  ",";
+                }else{
+                    s += ")";
+                }
+            }         
+            System.out.println(s);
+            Statement stmt = this.connection.createStatement();
+            int dialogButton = JOptionPane.YES_NO_OPTION;
+            int dialogResult = JOptionPane.showConfirmDialog(null, "Deseja mesmo inserir nova tupla?", "", dialogButton);
             if(dialogResult == 0) {
                 System.out.println(s);
                 ResultSet rs = stmt.executeQuery(s);  

@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -81,7 +82,7 @@ public class JanelaPrincipal {
 
         /*Tab de exibicao*/
         pPainelDeExibicaoDeDados = new JPanel();
-        pPainelDeExibicaoDeDados.setLayout(new GridLayout(2, 1));
+        pPainelDeExibicaoDeDados.setLayout(new GridBagLayout());
         deleteButton = new JButton("Delete");
           
         tabbedPane.add(pPainelDeExibicaoDeDados, "Exibição");
@@ -127,8 +128,16 @@ public class JanelaPrincipal {
                 
                 query = new JTable(dados, colunas);
                 JScrollPane jsp = new JScrollPane(query);
+                GridBagConstraints constraints = new GridBagConstraints();
+                constraints.fill = GridBagConstraints.BOTH;
+                constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+                constraints.weightx = 1;
+                constraints.weighty = 0.1;
+                constraints.gridx = 0;
+                constraints.gridy = 1;
+                constraints.gridwidth=2;
                 
-                pPainelDeBuscaDeDados.add(jsp);
+                pPainelDeBuscaDeDados.add(jsp, constraints);
                 
                 tabbedPane.repaint();
  
@@ -143,6 +152,12 @@ public class JanelaPrincipal {
                 ArrayList<String> columns = getComponents();
                 String[] colunas = new String[columns.size()];
                 colunas = columns.toArray(colunas);
+               
+                String[] fields = new String[query.getColumnCount()];
+                for(int i = 0; i < query.getColumnCount(); i++){
+                    fields[i] = query.getModel().getValueAt(0, i).toString();
+                    System.out.println(fields[i]);
+                }
                 bd.updateData(tableName, colunas, data);
             }
         });
@@ -152,8 +167,21 @@ public class JanelaPrincipal {
         insertButton.addActionListener( new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                //ArrayList<String> domains = prepareChecks();
+                Component[] components = ((JPanel) pPainelDeInsecaoDeDados.getComponent(0)).getComponents();
+                ArrayList<String> aux = new ArrayList<String>();
+                for(int i = 1; i< (components.length); i += 2){
+                    try{
+                        aux.add(((JTextField) components[i]).getText());
+                    }catch(Exception ex){
+                        aux.add(((JComboBox) components[i]).getSelectedItem().toString());
+                    }
+                }
+                String[] fields = new String[components.length/2];
+                fields = aux.toArray(fields);
+                bd.insertData(tableName, fields);
+                for(String s:aux){
+                    System.out.println(s);
+                }
                 
             }
         });
@@ -298,51 +326,72 @@ public class JanelaPrincipal {
         //String columnNames = this.bd.getMeta(tableName, "COLUMN_NAME");
         ArrayList<String> arr = this.bd.splitString(columnNames, ",");
         int nLinhas = arr.size();
-        pPainelDeBuscaDeDados.setLayout(new GridLayout(2, 1));
-        pPainelDeBuscaDeDados.add(new JPanel());
-        ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).setLayout(new GridLayout(nLinhas + 1, 2));
-        //System.out.println(nLinhas);
-        //System.out.println(arr.get(0));
+        pPainelDeBuscaDeDados.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        constraints.weightx = 1;
+        constraints.weighty = 0.7;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth=2;
+        pPainelDeBuscaDeDados.add(new JPanel(), constraints);
+        ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).setLayout(new GridLayout(nLinhas, 2));
         for(int i = 0; i< nLinhas; i++){
             ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).add(new JLabel(arr.get(i)));
             ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).add(new JTextField("Digite aqui"));
         }
         
-        ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).add(searchButton);
-        ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).add(updateButton);
-        
         query =  new JTable();
-        pPainelDeBuscaDeDados.add(query);
+        constraints.weighty = 0.1;
+        constraints.gridy = 1;
+        pPainelDeBuscaDeDados.add(query, constraints);
         
+        constraints.weighty = 0.05;
+        constraints.gridy = 2;
+        constraints.gridwidth=1;
+        pPainelDeBuscaDeDados.add(searchButton, constraints);
+        constraints.gridx = 1;
+        pPainelDeBuscaDeDados.add(updateButton, constraints);
+              
     }
     
     private void showInsertPanel(){
         String columnNames = this.bd.getMeta(tableName, "COLUMN_NAME");
         ArrayList<String> arr = this.bd.splitString(columnNames, ",");
         int nLinhas = arr.size();
-        pPainelDeInsecaoDeDados.setLayout(new GridLayout(nLinhas + 1, 2));
-        
+        pPainelDeInsecaoDeDados.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        constraints.weightx = 1;
+        constraints.weighty = 0.95;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        pPainelDeInsecaoDeDados.add(new JPanel(), constraints);
+        ((JPanel)pPainelDeInsecaoDeDados.getComponent(0)).setLayout(new GridLayout(nLinhas, 2));
         ArrayList<ArrayList<String>> domains = prepareChecks();
         
         int j = 0;
         
         for(int i = 0; i< nLinhas; i++){
-            pPainelDeInsecaoDeDados.add(new JLabel(arr.get(i)));
+            ((JPanel)pPainelDeInsecaoDeDados.getComponent(0)).add(new JLabel(arr.get(i)));
             //System.out.println(domains.get(j).get(0));
             if(domains.size() > 0 && j < domains.size() && domains.get(j).get(0).toUpperCase().equals(arr.get(i))){
                 JComboBox jcb = new JComboBox();
                 ArrayList<String> op = getOp(domains.get(j).get(1));
                 for(int k = 0; k < op.size(); k++){
-                    jcb.addItem(op.get(k));
+                    jcb.addItem(op.get(k).replaceAll("'", ""));
                 }
-                pPainelDeInsecaoDeDados.add(jcb);
+                ((JPanel)pPainelDeInsecaoDeDados.getComponent(0)).add(jcb);
                 j++;
             }else{
-                pPainelDeInsecaoDeDados.add(new JTextField("Digite aqui"));
+                ((JPanel)pPainelDeInsecaoDeDados.getComponent(0)).add(new JTextField("Digite aqui"));
             }  
         }
-        pPainelDeInsecaoDeDados.add(new JLabel(""));    
-        pPainelDeInsecaoDeDados.add(insertButton);
+        constraints.weighty = 0.05;
+        constraints.gridy = 1;
+        pPainelDeInsecaoDeDados.add(insertButton, constraints);
     }
     
     private void showDisplayPanel(){
@@ -362,15 +411,24 @@ public class JanelaPrincipal {
         
         jt = new JTable(dados, colunas);
         JScrollPane jsp = new JScrollPane(jt);
-        pPainelDeExibicaoDeDados.add(jsp);
-        pPainelDeExibicaoDeDados.add(deleteButton);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        constraints.weightx = 1;
+        constraints.weighty = 0.95;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        pPainelDeExibicaoDeDados.add(jsp, constraints);
+        constraints.weighty = 0.05;
+        constraints.gridy = 1;
+        pPainelDeExibicaoDeDados.add(deleteButton, constraints);
 
     }
     
     private ArrayList<String> getComponents(){
         Component[] components = ((JPanel) pPainelDeBuscaDeDados.getComponent(0)).getComponents();
         ArrayList<String> aux = new ArrayList<String>();
-        for(int i = 1; i< (components.length - 2); i += 2){
+        for(int i = 1; i< (components.length); i += 2){
             aux.add(((JTextField) components[i]).getText());
         }    
         return aux;
