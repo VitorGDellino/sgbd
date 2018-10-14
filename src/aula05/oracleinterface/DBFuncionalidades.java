@@ -37,8 +37,8 @@ public class DBFuncionalidades {
             DriverManager.registerDriver (new oracle.jdbc.OracleDriver());
             connection = DriverManager.getConnection(
                     "jdbc:oracle:thin:@grad.icmc.usp.br:15215:orcl",
-                    "pratica5",
-                    "pratica5");
+                    "L9277875",
+                    "L9277875");
             return true;
         } catch(SQLException ex){
             jtAreaDeStatus.setText("Problema: verifique seu usuário e senha");
@@ -144,7 +144,7 @@ public class DBFuncionalidades {
         String res = "";
         try{
             
-            s = "SELECT b.column_name FROM USER_CONSTRAINTS A, USER_CONS_COLUMNS B WHERE B.TABLE_NAME LIKE 'LBD%' AND CONSTRAINT_TYPE = 'P' AND A.CONSTRAINT_NAME = B.CONSTRAINT_NAME AND A.TABLE_NAME = '" + tableName + "'";
+            s = "SELECT b.column_name FROM USER_CONSTRAINTS A, USER_CONS_COLUMNS B WHERE B.TABLE_NAME LIKE '"+ tableName +"' AND CONSTRAINT_TYPE = 'P' AND A.CONSTRAINT_NAME = B.CONSTRAINT_NAME AND A.TABLE_NAME = '" + tableName + "'";
             Statement stmt = this.connection.createStatement();
             ResultSet rs = stmt.executeQuery(s);
             
