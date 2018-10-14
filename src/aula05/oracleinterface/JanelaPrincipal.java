@@ -153,7 +153,7 @@ public class JanelaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                ArrayList<String> domains = prepareChecks();
+                //ArrayList<String> domains = prepareChecks();
                 
             }
         });
@@ -197,7 +197,7 @@ public class JanelaPrincipal {
         return newDomains;
     }
     
-    private ArrayList<String> prepareChecks(){
+    private ArrayList<ArrayList<String>> prepareChecks(){
          ArrayList<String> domains = bd.splitString(bd.getDomain(tableName), "/");
   
         domains = filterChecks(domains);
@@ -220,8 +220,13 @@ public class JanelaPrincipal {
          for(int i = 0; i < finalDomains.size(); i++){
            System.out.println(finalDomains.get(i));
          }
+         
+         ArrayList<ArrayList<String>> att_domain = new ArrayList<ArrayList<String>>();
+         for(int i = 0; i < finalDomains.size(); i++){
+             att_domain.add(bd.splitString(finalDomains.get(i), " IN "));
+         }
 
-         return finalDomains;
+         return att_domain;
     }
     
     public void updateDDLPanel(){
@@ -317,9 +322,19 @@ public class JanelaPrincipal {
         int nLinhas = arr.size();
         pPainelDeInsecaoDeDados.setLayout(new GridLayout(nLinhas + 1, 2));
         
+        ArrayList<ArrayList<String>> domains = prepareChecks();
+        
+        int j = 0;
+        
         for(int i = 0; i< nLinhas; i++){
             pPainelDeInsecaoDeDados.add(new JLabel(arr.get(i)));
-            pPainelDeInsecaoDeDados.add(new JTextField("Digite aqui"));
+            //System.out.println(domains.get(j).get(0));
+            if(domains.size() > 0 && j < domains.size() && domains.get(j).get(0).toUpperCase().equals(arr.get(i))){
+                pPainelDeInsecaoDeDados.add(new JComboBox());
+                j++;
+            }else{
+                pPainelDeInsecaoDeDados.add(new JTextField("Digite aqui"));
+            }  
         }
         pPainelDeInsecaoDeDados.add(new JLabel(""));    
         pPainelDeInsecaoDeDados.add(insertButton);
