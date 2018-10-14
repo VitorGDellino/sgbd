@@ -330,7 +330,12 @@ public class JanelaPrincipal {
             pPainelDeInsecaoDeDados.add(new JLabel(arr.get(i)));
             //System.out.println(domains.get(j).get(0));
             if(domains.size() > 0 && j < domains.size() && domains.get(j).get(0).toUpperCase().equals(arr.get(i))){
-                pPainelDeInsecaoDeDados.add(new JComboBox());
+                JComboBox jcb = new JComboBox();
+                ArrayList<String> op = getOp(domains.get(j).get(1));
+                for(int k = 0; k < op.size(); k++){
+                    jcb.addItem(op.get(k));
+                }
+                pPainelDeInsecaoDeDados.add(jcb);
                 j++;
             }else{
                 pPainelDeInsecaoDeDados.add(new JTextField("Digite aqui"));
@@ -367,8 +372,14 @@ public class JanelaPrincipal {
         ArrayList<String> aux = new ArrayList<String>();
         for(int i = 1; i< (components.length - 2); i += 2){
             aux.add(((JTextField) components[i]).getText());
-        }
-        
+        }    
         return aux;
     } 
+    
+    private ArrayList<String> getOp(String domain){
+        ArrayList<String> op = new ArrayList<String>();
+        domain = domain.substring(1, domain.length()-1);
+        op = bd.splitString(domain, ",");
+        return op;
+    }
 }

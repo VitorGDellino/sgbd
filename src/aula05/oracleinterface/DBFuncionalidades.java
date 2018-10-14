@@ -37,8 +37,8 @@ public class DBFuncionalidades {
             DriverManager.registerDriver (new oracle.jdbc.OracleDriver());
             connection = DriverManager.getConnection(
                     "jdbc:oracle:thin:@grad.icmc.usp.br:15215:orcl",
-                    "pratica5",
-                    "pratica5");
+                    "L9277875",
+                    "L9277875");
             return true;
         } catch(SQLException ex){
             jtAreaDeStatus.setText("Problema: verifique seu usuário e senha");
