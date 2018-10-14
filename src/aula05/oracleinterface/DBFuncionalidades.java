@@ -268,10 +268,10 @@ public class DBFuncionalidades {
     }
     
     public String generateDLL(String usuario, String senha){
-        //Connection connect = conectar_usuario(usuario, senha);
+        Connection connect = conectar_usuario(usuario, senha);
         try{
             String tables = "SELECT TABLE_NAME FROM USER_ALL_TABLES ORDER BY TABLE_NAME";
-            Statement stmt = this.connection.createStatement();
+            Statement stmt = connect.createStatement();
             String config = "begin\n" +
                             "dbms_metadata.set_transform_param(dbms_metadata.session_transform,'STORAGE',false);\n" +
                             "dbms_metadata.set_transform_param(dbms_metadata.session_transform,'SEGMENT_ATTRIBUTES',false);\n" +
@@ -279,8 +279,8 @@ public class DBFuncionalidades {
                             "end;";
             String ddl = "";
             ResultSet rs_tables = stmt.executeQuery(tables);
-            //Connection c = conectar_usuario(usuario, senha);
-            Statement s = this.connection.createStatement();
+            Connection c = conectar_usuario(usuario, senha);
+            Statement s = c.createStatement();
             s.execute(config);
             while(rs_tables.next()){
                 String table = rs_tables.getString("TABLE_NAME");
