@@ -124,7 +124,7 @@ public class JanelaPrincipal {
                 
                 //System.out.println(dados[0].length);
                 
-                pPainelDeBuscaDeDados.remove(1);
+                //pPainelDeBuscaDeDados.remove(1);
                 
                 query = new JTable(dados, colunas);
                 JScrollPane jsp = new JScrollPane(query);
@@ -153,11 +153,6 @@ public class JanelaPrincipal {
                 String[] colunas = new String[columns.size()];
                 colunas = columns.toArray(colunas);
                
-                String[] fields = new String[query.getColumnCount()];
-                for(int i = 0; i < query.getColumnCount(); i++){
-                    fields[i] = query.getModel().getValueAt(0, i).toString();
-                    System.out.println(fields[i]);
-                }
                 bd.updateData(tableName, colunas, data);
             }
         });
@@ -345,7 +340,7 @@ public class JanelaPrincipal {
         query =  new JTable();
         constraints.weighty = 0.1;
         constraints.gridy = 1;
-        pPainelDeBuscaDeDados.add(query, constraints);
+        //pPainelDeBuscaDeDados.add(query, constraints);
         
         constraints.weighty = 0.05;
         constraints.gridy = 2;
